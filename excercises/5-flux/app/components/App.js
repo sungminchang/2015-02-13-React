@@ -20,11 +20,17 @@ var App = React.createClass({
     this.setState(ContactsStore.getState());
   },
 
+  removeContact (id) {
+    ViewActionCreators.removeContact(id);
+  },
+
   renderContacts () {
     return this.state.contacts.map((contact) => {
-      return <li>{contact.first} {contact.last}</li>;
+      return <li onClick={this.removeContact.bind(this, contact.id)}>{contact.first} {contact.last}</li>;
     });
   },
+
+// hint: use `xhr.deleteJSON(url)` where the url is `/contacts/:id`
 
   render () {
     if (!this.state.loaded) {

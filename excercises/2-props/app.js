@@ -24,42 +24,95 @@ var warning = require('react/lib/warning');
 var GRAVATAR_URL = "http://gravatar.com/avatar";
 
 var USERS = [
-  { id: 1, name: 'Ryan Florence', email: 'rpflorencegmail.com' },
-  { id: 2, name: 'Michael Jackson', email: 'mjijackson@gmail.com' }
+  { id: 1, name: 'Ryan Florence', email: 'rpflorence@gmail.com', size: '128', gender: 'male' },
+  { id: 2, name: 'Michael Jackson', email: 'mjijackson@gmail.com', size: '256', gender:''}
 ];
 
 var emailType = (props, propName, componentName) => {
   warning(
-    validateEmail(props.email),
-    `Invalid email '${props.email}' sent to 'Gravatar'. Check the render method of '${componentName}'.`
+    validateEmail(props.loginId),
+    `Invalid email '${props.loginId}' sent to 'Gravatar'. Check the render method of '${componentName}'.`
   );
 };
 
+var validateSize = function(size) {
+  return !isNaN(parseInt(size, 10));
+};
+
+var sizeType = (props, propName, componentName) => {
+  warning(
+    validateSize(props.size),
+    `Invalid size '${props.size}' sent to 'Gravatar'. Check the render method of '${componentName}'.`
+  );
+};
+
+var validateHidden = function(hidden) {
+  return true;
+};
+
+var hiddenType = (props, propName, componentName) => {
+  warning(
+    validateHidden(props.hide),
+    `Invalid attribute hide '${props.hide}' sent to 'Gravatar'. Check the render method of '${componentName}'.`
+  );
+};
+
+var validateGender = function(gender) {
+  var genders = ['male', 'female', 'both', 'neither', 'other', ''];
+  return genders.indexOf(gender) !== -1;
+};
+
+var genderType = (props, propName, componentName) => {
+  warning(
+    validateGender(props.gender),
+    `Invalid attribute gender '${props.gender}' sent to 'Gravatar'. Check the render method of '${componentName}'.`
+  );
+};
+
+
 var Gravatar = React.createClass({
   propTypes: {
-    email: emailType
+    loginId: emailType,
+    size: sizeType,
+    hide: hiddenType,
+    gender: genderType
   },
 
   getDefaultProps () {
+    console.log('called getDefaultProps');
     return {
       size: 16
     };
   },
 
   render () {
-    var { email, size } = this.props;
-    var hash = md5(email);
+    var { loginId, size } = this.props;
+    var hash = md5(loginId);
     var url = `${GRAVATAR_URL}/${hash}?s=${size*2}`;
     return <img src={url} width={size} />;
   }
 });
 
+var GravatarSummaryBox = React.createClass({
+  propTypes: {
+    user: React.PropTypes.shape({
+      gender: genderType
+    })
+  },
+
+  render () {
+    var user = this.props.user;
+    return <p>{user.gender}</p>
+  }
+});
+
 var App = React.createClass({
   render () {
-    var users = USERS.map((user) => {
+    var users = this.props.users.map((user) => {
       return (
         <li key={user.id}>
-          <Gravatar email={user.email} size={36} /> {user.name}
+          <Gravatar loginId={user.email} size={user.size} hide={user.hidden} gender={user.gender} /> {user.name}
+          <GravatarSummaryBox user={user} />
         </li>
       );
     });
@@ -72,7 +125,7 @@ var App = React.createClass({
   }
 });
 
-React.render(<App />, document.body);
+React.render(<App users={USERS} />, document.body);
 
 //require('./tests').run(Gravatar, emailType);
 

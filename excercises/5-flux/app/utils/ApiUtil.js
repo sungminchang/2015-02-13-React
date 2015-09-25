@@ -7,6 +7,15 @@ var ApiUtils = {
     xhr.getJSON(`${API}/contacts`, (err, res) => {
       ServerActionCreators.loadedContacts(res.contacts);
     });
+  },
+
+  removeContact (id) {
+    console.log(`${API}/contacts/:${id}`);
+    xhr.deleteJSON(`${API}/contacts/:${id}`, (err, res) => {
+      //console.log(res);
+      this.loadContacts();
+      //ServerActionCreators.loadedContacts(res.contacts);
+    });
   }
 };
 

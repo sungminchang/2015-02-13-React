@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+ ////////////////////////////////////////////////////////////////////////////////
 // Excercise:
 // - make these tabs work when you click them
 ////////////////////////////////////////////////////////////////////////////////
@@ -13,10 +13,30 @@ var DATA = [
 
 var App = React.createClass({
 
+  getInitialState () {
+   return {selectedTab: 0}
+  },
+
+  switchToTab (e) {
+    console.log(e);
+    var target = e.dispatchMarker.split('.');
+    console.log(target[target.length - 1]);
+    var newSelectedTab = parseInt(target[target.length - 1], 10);
+
+    this.setState({selectedTab: newSelectedTab});
+  },
+
   renderTabs () {
+    console.log('rendertabls called');
     return this.props.countries.map((country, index) => {
+      //console.log('index', index, 'seelcted tab', this.state.selectedTab);
+      //console.log('index === this.state.selectedTab', index === this.state.selectedTab);
+      var styling = index === this.state.selectedTab ? this.props.styles.activeTab : this.props.styles.tab;
+      //console.log('styling', styling);
+      //console.log('this.props.styles.activeTab', this.props.styles.activeTab);
+
       return (
-        <div style={index === 0 ? styles.activeTab : styles.tab}>
+        <div onClick={this.switchToTab} style={index === this.state.selectedTab ? this.props.styles.activeTab : this.props.styles.tab}>
           {country.name}
         </div>
       );
@@ -24,7 +44,8 @@ var App = React.createClass({
   },
 
   renderPanel () {
-    var country = this.props.countries[0];
+    console.log('rendering Panel');
+    var country = this.props.countries[this.state.selectedTab];
     return (
       <div>
         <p>{country.description}</p>
@@ -33,12 +54,13 @@ var App = React.createClass({
   },
 
   render () {
-    return (
-      <div style={styles.app}>
-        <div style={styles.tabs}>
+   var styles = this.props.styles;
+   return (
+      <div style={this.props.styles.app}>
+        <div style={this.props.styles.tabs}>
           {this.renderTabs()}
         </div>
-        <div style={styles.tabPanels}>
+        <div style={this.props.styles.tabPanels}>
           {this.renderPanel()}
         </div>
       </div>
@@ -66,5 +88,5 @@ styles.tabPanels = {
   padding: 10
 };
 
-React.render(<App countries={DATA}/>, document.body);
+React.render(<App countries={DATA} styles={styles}/>, document.body);
 
